@@ -80,7 +80,22 @@ const App = () => {
       const saved = localStorage.getItem('renovation_theme_v1');
       return saved ? JSON.parse(saved) : true; 
   });
-  const [viewMode, setViewMode] = useState('web');
+  
+  // 根据屏幕宽度自动切换手机端/网页端
+  const [viewMode, setViewMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 768 ? 'mobile' : 'web';
+    }
+    return 'web';
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setViewMode(window.innerWidth < 768 ? 'mobile' : 'web');
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // --- 状态与提醒逻辑 ---
   useEffect(() => {
@@ -267,7 +282,6 @@ const App = () => {
   const textTitle = isLargeFont ? 'text-2xl' : 'text-lg';
   const textSmall = isLargeFont ? 'text-base' : 'text-xs';
   const inputHeight = isLargeFont ? 'h-14' : 'h-10';
-  const iconSize = isLargeFont ? 'w-6 h-6' : 'w-4 h-4';
 
   return (
     <div className={`min-h-screen font-sans transition-colors duration-300 pb-24 ${bgTheme}`}>
@@ -420,7 +434,7 @@ const App = () => {
                 </div>
             ) : (
               displayedRecords.map((record, index) => (
-                <div key={record.id} id={record.id} className={`p-6 rounded-2xl border shadow-sm transition-all duration-300 animate-in slide-in-from-bottom-2 ${cardBg}`}>
+                <div key={record.id} id={record.id} className={`p-4 md:p-6 rounded-2xl border shadow-sm transition-all duration-300 animate-in slide-in-from-bottom-2 ${cardBg}`}>
                   <div className="flex justify-between items-start mb-6">
                     <h3 className={`font-black ${textTitle} flex flex-wrap items-center gap-2`}>
                       {/* 11. 「细分类型 - 品牌&型号 - 最低价格」及判空标红逻辑 */}
@@ -442,23 +456,23 @@ const App = () => {
                     
                     {/* 2 & 3. 细分类型(输入框与预设合并)及锁定状态 */}
                     <div className="space-y-2">
-                      <label className={`block font-bold opacity-70 ${textSmall}`}>细分类型</label>
-                      <div className="flex gap-2 items-center">
+                      <label className={`block font-bold opacity-70 text-[13px] md:${textSmall}`}>细分类型</label>
+                      <div className="flex gap-2 items-center flex-wrap sm:flex-nowrap">
                           <input 
                               list={`sub-${record.id}`}
                               disabled={record.isSubCategoryLocked}
                               value={record.subCategory}
                               onChange={(e) => updateRecord(record.id, 'subCategory', e.target.value)}
                               placeholder="点击选择或手动输入"
-                              className={`flex-1 px-4 rounded-lg border outline-none transition-colors focus:ring-2 focus:ring-blue-500 ${inputHeight} ${textBase} ${inputBg} ${record.isSubCategoryLocked ? 'opacity-60' : ''}`}
+                              className={`flex-1 min-w-[120px] px-3 md:px-4 rounded-lg border outline-none transition-colors focus:ring-2 focus:ring-blue-500 ${inputHeight} text-[13px] md:${textBase} ${inputBg} ${record.isSubCategoryLocked ? 'opacity-60' : ''}`}
                           />
                           <datalist id={`sub-${record.id}`}>
                               {(CATEGORY_MAP[record.category] || []).map(s => <option key={s} value={s}>{s}</option>)}
                           </datalist>
-                          <button onClick={() => updateRecord(record.id, 'isSubCategoryLocked', !record.isSubCategoryLocked)} className="p-3 border rounded-lg shrink-0 transition-colors hover:bg-gray-500/10">
-                              {record.isSubCategoryLocked ? <Lock className="text-green-500" /> : <Unlock />}
+                          <button onClick={() => updateRecord(record.id, 'isSubCategoryLocked', !record.isSubCategoryLocked)} className="p-2 md:p-3 border rounded-lg shrink-0 transition-colors hover:bg-gray-500/10">
+                              {record.isSubCategoryLocked ? <Lock className="text-green-500" size={20} /> : <Unlock size={20} />}
                           </button>
-                          <span className={`font-bold shrink-0 w-24 text-center transition-colors ${textSmall} ${record.isSubCategoryLocked ? 'text-green-500' : 'text-orange-500'}`}>
+                          <span className={`font-bold shrink-0 w-20 md:w-24 text-center transition-colors text-[13px] md:${textSmall} ${record.isSubCategoryLocked ? 'text-green-500' : 'text-orange-500'}`}>
                               {record.isSubCategoryLocked ? '👈已确定' : '👈确定了吗？'}
                           </span>
                       </div>
@@ -466,24 +480,24 @@ const App = () => {
 
                     {/* 3. 品牌及锁定状态 */}
                     <div className="space-y-2">
-                      <label className={`block font-bold opacity-70 ${textSmall}`}>品牌</label>
-                      <div className="flex gap-2 items-center">
+                      <label className={`block font-bold opacity-70 text-[13px] md:${textSmall}`}>品牌</label>
+                      <div className="flex gap-2 items-center flex-wrap sm:flex-nowrap">
                           <input 
                               list={`brand-${record.id}`} 
                               disabled={record.isBrandLocked}
                               placeholder="点击选择或手动输入" 
                               value={record.brand} 
                               onChange={(e) => updateRecord(record.id, 'brand', e.target.value)} 
-                              className={`flex-1 px-4 rounded-lg border outline-none transition-colors focus:ring-2 focus:ring-blue-500 ${inputHeight} ${textBase} ${inputBg} ${record.isBrandLocked ? 'opacity-60' : ''}`} 
+                              className={`flex-1 min-w-[120px] px-3 md:px-4 rounded-lg border outline-none transition-colors focus:ring-2 focus:ring-blue-500 ${inputHeight} text-[13px] md:${textBase} ${inputBg} ${record.isBrandLocked ? 'opacity-60' : ''}`} 
                           />
                           {/* 动态映射品牌 Datalist */}
                           <datalist id={`brand-${record.id}`}>
                               {(BRAND_MAP[record.category] || []).map(b => <option key={b} value={b}>{b}</option>)}
                           </datalist>
-                          <button onClick={() => updateRecord(record.id, 'isBrandLocked', !record.isBrandLocked)} className="p-3 border rounded-lg shrink-0 transition-colors hover:bg-gray-500/10">
-                              {record.isBrandLocked ? <Lock className="text-green-500" /> : <Unlock />}
+                          <button onClick={() => updateRecord(record.id, 'isBrandLocked', !record.isBrandLocked)} className="p-2 md:p-3 border rounded-lg shrink-0 transition-colors hover:bg-gray-500/10">
+                              {record.isBrandLocked ? <Lock className="text-green-500" size={20} /> : <Unlock size={20} />}
                           </button>
-                          <span className={`font-bold shrink-0 w-24 text-center transition-colors ${textSmall} ${record.isBrandLocked ? 'text-green-500' : 'text-orange-500'}`}>
+                          <span className={`font-bold shrink-0 w-20 md:w-24 text-center transition-colors text-[13px] md:${textSmall} ${record.isBrandLocked ? 'text-green-500' : 'text-orange-500'}`}>
                               {record.isBrandLocked ? '👈已确定' : '👈确定了吗？'}
                           </span>
                       </div>
@@ -491,20 +505,20 @@ const App = () => {
 
                     {/* 型号 & 全网查价 & 锁定状态 (已仿照品牌新增锁定功能) */}
                     <div className="space-y-2">
-                      <label className={`block font-bold opacity-70 ${textSmall}`}>型号</label>
+                      <label className={`block font-bold opacity-70 text-[13px] md:${textSmall}`}>型号</label>
                       <div className="flex gap-2 items-center flex-wrap sm:flex-nowrap">
                           <input 
                               disabled={record.isModelLocked}
                               value={record.model || ''} 
                               onChange={(e) => updateRecord(record.id, 'model', e.target.value)} 
                               placeholder="手动输入具体型号" 
-                              className={`flex-1 min-w-[120px] px-4 rounded-lg border outline-none transition-colors focus:ring-2 focus:ring-blue-500 ${inputHeight} ${textBase} ${inputBg} ${record.isModelLocked ? 'opacity-60' : ''}`} 
+                              className={`flex-1 min-w-[100px] px-3 md:px-4 rounded-lg border outline-none transition-colors focus:ring-2 focus:ring-blue-500 ${inputHeight} text-[13px] md:${textBase} ${inputBg} ${record.isModelLocked ? 'opacity-60' : ''}`} 
                           />
-                          <button onClick={() => openSearchModal(record.brand, record.model)} className={`px-4 rounded-lg font-black shrink-0 transition-transform hover:scale-[1.02] active:scale-95 shadow-md ${inputHeight} bg-red-500 text-white`}>全网查低价</button>
-                          <button onClick={() => updateRecord(record.id, 'isModelLocked', !record.isModelLocked)} className="p-3 border rounded-lg shrink-0 transition-colors hover:bg-gray-500/10">
-                              {record.isModelLocked ? <Lock className="text-green-500" /> : <Unlock />}
+                          <button onClick={() => openSearchModal(record.brand, record.model)} className={`px-3 md:px-4 rounded-lg font-black shrink-0 transition-transform hover:scale-[1.02] active:scale-95 shadow-md ${inputHeight} bg-red-500 text-white text-[13px] md:${textBase}`}>全网查低价</button>
+                          <button onClick={() => updateRecord(record.id, 'isModelLocked', !record.isModelLocked)} className="p-2 md:p-3 border rounded-lg shrink-0 transition-colors hover:bg-gray-500/10">
+                              {record.isModelLocked ? <Lock className="text-green-500" size={20} /> : <Unlock size={20} />}
                           </button>
-                          <span className={`font-bold shrink-0 w-24 text-center transition-colors ${textSmall} ${record.isModelLocked ? 'text-green-500' : 'text-orange-500'}`}>
+                          <span className={`font-bold shrink-0 w-20 md:w-24 text-center transition-colors text-[13px] md:${textSmall} ${record.isModelLocked ? 'text-green-500' : 'text-orange-500'}`}>
                               {record.isModelLocked ? '👈已确定' : '👈确定了吗？'}
                           </span>
                       </div>
@@ -513,16 +527,14 @@ const App = () => {
                     {/* 渠道价格 */}
                     <div className="space-y-3">
                       <div className="flex justify-between">
-                          <label className={`font-bold opacity-70 ${textSmall}`}>价格对比</label>
-                          <button onClick={() => addPriceChannel(record.id)} className="text-indigo-500 flex items-center gap-1 font-bold transition-opacity hover:opacity-70"><PlusCircle size={18}/> 新增对比</button>
+                          <label className={`font-bold opacity-70 text-[13px] md:${textSmall}`}>价格对比</label>
+                          <button onClick={() => addPriceChannel(record.id)} className={`text-indigo-500 flex items-center gap-1 font-bold transition-opacity hover:opacity-70 text-[13px] md:${textSmall}`}><PlusCircle size={18}/> 新增对比</button>
                       </div>
                       {record.prices.map((p, pIdx) => (
-                          <div key={p.id} className="flex gap-2 animate-in slide-in-from-top-2 duration-300">
-                              <select value={p.channel} onChange={(e) => updatePrice(record.id, p.id, 'channel', e.target.value)} className={`w-1/3 px-4 rounded-lg border outline-none transition-colors ${inputHeight} ${inputBg}`}>
-                                  {PRESET_CHANNELS.map(c => <option key={c} value={c}>{c}</option>)}
-                              </select>
-                              <input type="number" value={p.price} onChange={(e) => updatePrice(record.id, p.id, 'price', e.target.value)} placeholder="价格" className={`flex-1 px-4 rounded-lg border outline-none font-bold transition-colors focus:ring-2 focus:ring-blue-500 ${inputHeight} ${inputBg}`} />
-                              {record.prices.length > 1 && <button onClick={() => removePrice(record.id, p.id)} className="p-3 text-red-500 transition-transform hover:scale-110"><X /></button>}
+                          <div key={p.id} className="flex gap-2 items-center flex-wrap sm:flex-nowrap animate-in slide-in-from-top-2 duration-300">
+                              <input list="channel-list" value={p.channel} onChange={(e) => updatePrice(record.id, p.id, 'channel', e.target.value)} placeholder="选择渠道" className={`w-24 md:w-1/3 px-3 md:px-4 rounded-lg border outline-none transition-colors ${inputHeight} text-[13px] md:${textBase} ${inputBg}`} />
+                              <input type="number" value={p.price} onChange={(e) => updatePrice(record.id, p.id, 'price', e.target.value)} placeholder="价格" className={`flex-1 min-w-[100px] px-3 md:px-4 rounded-lg border outline-none font-bold transition-colors focus:ring-2 focus:ring-blue-500 ${inputHeight} text-[13px] md:${textBase} ${inputBg}`} />
+                              {record.prices.length > 1 && <button onClick={() => removePrice(record.id, p.id)} className="p-2 md:p-3 text-red-500 transition-transform hover:scale-110 shrink-0"><X size={20}/></button>}
                           </div>
                       ))}
                     </div>
@@ -570,30 +582,23 @@ const App = () => {
         </div>
       )}
 
-      {/* 5. 全网查低价 - 查询前5个渠道的网页搜索方式，并根据输入的品牌和型号展示在预览气泡对应页签内 */}
+      {/* 5. 全网查低价 - 改为从上到下的并排跳转按钮，对应5个电商渠道 */}
       {searchModal.show && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
-          <div className={`w-[95%] h-[90%] rounded-[2rem] flex flex-col overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 ${isDarkMode ? 'bg-[#1e2025]' : 'bg-white'}`}>
+          <div className={`w-full max-w-sm rounded-[2rem] flex flex-col overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 ${isDarkMode ? 'bg-[#1e2025]' : 'bg-white'}`}>
              <div className="p-6 flex justify-between items-center border-b border-gray-500/20 shrink-0">
-                <h2 className="text-2xl font-black truncate max-w-[80%]">🔍 搜价：{searchModal.brand} {searchModal.model}</h2>
+                <h2 className="text-xl font-black truncate max-w-[80%]">🔍 搜价：{searchModal.brand} {searchModal.model}</h2>
                 <button onClick={() => setSearchModal({ ...searchModal, show: false })} className="p-2 bg-gray-500/20 rounded-full shrink-0 transition-transform hover:scale-105"><X size={24}/></button>
              </div>
-             {/* 中间预览区 iframe 嵌入真实搜索结果 */}
-             <div className="flex-1 bg-white relative">
-                <iframe 
-                  src={getSearchUrl(searchModal.channel, `${searchModal.brand} ${searchModal.model}`.trim())}
-                  className="w-full h-full border-0" 
-                  title="search-preview" 
-                  sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-                />
-             </div>
-             {/* 底部页签 - 前5个渠道 */}
-             <div className="p-6 flex gap-4 overflow-x-auto border-t border-gray-500/20 shrink-0 no-scrollbar">
+             <div className="p-6 flex flex-col gap-4">
                 {PRESET_CHANNELS.slice(0, 5).map(ch => (
                     <button 
                         key={ch}
-                        onClick={() => setSearchModal({...searchModal, channel: ch})}
-                        className={`px-8 py-5 rounded-2xl font-black text-xl shrink-0 transition-all ${searchModal.channel === ch ? 'bg-red-500 text-white scale-105 shadow-lg' : 'bg-gray-500/20 hover:bg-gray-500/30'}`}
+                        onClick={() => {
+                            window.open(getSearchUrl(ch, `${searchModal.brand} ${searchModal.model}`.trim()), '_blank');
+                            setSearchModal({...searchModal, show: false});
+                        }}
+                        className={`w-full py-4 rounded-2xl font-black text-lg transition-all ${isDarkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-100 hover:bg-gray-200'}`}
                     >
                         {ch}
                     </button>
