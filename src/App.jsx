@@ -462,17 +462,31 @@ const App = () => {
                               list={`sub-${record.id}`}
                               disabled={record.isSubCategoryLocked}
                               value={record.subCategory}
-                              onChange={(e) => updateRecord(record.id, 'subCategory', e.target.value)}
+                              onFocus={(e) => {
+                                  if (record.subCategory) {
+                                      e.target.dataset.old = record.subCategory;
+                                      updateRecord(record.id, 'subCategory', '');
+                                  }
+                              }}
+                              onBlur={(e) => {
+                                  if (!record.subCategory && e.target.dataset.old) {
+                                      updateRecord(record.id, 'subCategory', e.target.dataset.old);
+                                  }
+                              }}
+                              onChange={(e) => {
+                                  e.target.dataset.old = '';
+                                  updateRecord(record.id, 'subCategory', e.target.value);
+                              }}
                               placeholder="点击选择或手动输入"
                               className={`flex-1 min-w-[120px] px-3 md:px-4 rounded-lg border outline-none transition-colors focus:ring-2 focus:ring-blue-500 ${inputHeight} text-[13px] md:${textBase} ${inputBg} ${record.isSubCategoryLocked ? 'opacity-60' : ''}`}
                           />
                           <datalist id={`sub-${record.id}`}>
                               {(CATEGORY_MAP[record.category] || []).map(s => <option key={s} value={s}>{s}</option>)}
                           </datalist>
-                          <button onClick={() => updateRecord(record.id, 'isSubCategoryLocked', !record.isSubCategoryLocked)} className="p-2 md:p-3 border rounded-lg shrink-0 transition-colors hover:bg-gray-500/10">
+                          <button onClick={() => updateRecord(record.id, 'isSubCategoryLocked', !record.isSubCategoryLocked)} className="p-2 md:p-3 border rounded-lg shrink-0 transition-colors hover:bg-gray-500/10 ml-auto">
                               {record.isSubCategoryLocked ? <Lock className="text-green-500" size={20} /> : <Unlock size={20} />}
                           </button>
-                          <span className={`font-bold shrink-0 w-20 md:w-24 text-center transition-colors text-[13px] md:${textSmall} ${record.isSubCategoryLocked ? 'text-green-500' : 'text-orange-500'}`}>
+                          <span className={`font-bold shrink-0 w-20 md:w-24 text-left whitespace-nowrap transition-colors text-[13px] md:${textSmall} ${record.isSubCategoryLocked ? 'text-green-500' : 'text-orange-500'}`}>
                               {record.isSubCategoryLocked ? '👈已确定' : '👈确定了吗？'}
                           </span>
                       </div>
@@ -487,17 +501,31 @@ const App = () => {
                               disabled={record.isBrandLocked}
                               placeholder="点击选择或手动输入" 
                               value={record.brand} 
-                              onChange={(e) => updateRecord(record.id, 'brand', e.target.value)} 
+                              onFocus={(e) => {
+                                  if (record.brand) {
+                                      e.target.dataset.old = record.brand;
+                                      updateRecord(record.id, 'brand', '');
+                                  }
+                              }}
+                              onBlur={(e) => {
+                                  if (!record.brand && e.target.dataset.old) {
+                                      updateRecord(record.id, 'brand', e.target.dataset.old);
+                                  }
+                              }}
+                              onChange={(e) => {
+                                  e.target.dataset.old = '';
+                                  updateRecord(record.id, 'brand', e.target.value);
+                              }} 
                               className={`flex-1 min-w-[120px] px-3 md:px-4 rounded-lg border outline-none transition-colors focus:ring-2 focus:ring-blue-500 ${inputHeight} text-[13px] md:${textBase} ${inputBg} ${record.isBrandLocked ? 'opacity-60' : ''}`} 
                           />
                           {/* 动态映射品牌 Datalist */}
                           <datalist id={`brand-${record.id}`}>
                               {(BRAND_MAP[record.category] || []).map(b => <option key={b} value={b}>{b}</option>)}
                           </datalist>
-                          <button onClick={() => updateRecord(record.id, 'isBrandLocked', !record.isBrandLocked)} className="p-2 md:p-3 border rounded-lg shrink-0 transition-colors hover:bg-gray-500/10">
+                          <button onClick={() => updateRecord(record.id, 'isBrandLocked', !record.isBrandLocked)} className="p-2 md:p-3 border rounded-lg shrink-0 transition-colors hover:bg-gray-500/10 ml-auto">
                               {record.isBrandLocked ? <Lock className="text-green-500" size={20} /> : <Unlock size={20} />}
                           </button>
-                          <span className={`font-bold shrink-0 w-20 md:w-24 text-center transition-colors text-[13px] md:${textSmall} ${record.isBrandLocked ? 'text-green-500' : 'text-orange-500'}`}>
+                          <span className={`font-bold shrink-0 w-20 md:w-24 text-left whitespace-nowrap transition-colors text-[13px] md:${textSmall} ${record.isBrandLocked ? 'text-green-500' : 'text-orange-500'}`}>
                               {record.isBrandLocked ? '👈已确定' : '👈确定了吗？'}
                           </span>
                       </div>
@@ -510,15 +538,29 @@ const App = () => {
                           <input 
                               disabled={record.isModelLocked}
                               value={record.model || ''} 
-                              onChange={(e) => updateRecord(record.id, 'model', e.target.value)} 
-                              placeholder="手动输入具体型号" 
+                              onFocus={(e) => {
+                                  if (record.model) {
+                                      e.target.dataset.old = record.model;
+                                      updateRecord(record.id, 'model', '');
+                                  }
+                              }}
+                              onBlur={(e) => {
+                                  if (!record.model && e.target.dataset.old) {
+                                      updateRecord(record.id, 'model', e.target.dataset.old);
+                                  }
+                              }}
+                              onChange={(e) => {
+                                  e.target.dataset.old = '';
+                                  updateRecord(record.id, 'model', e.target.value);
+                              }} 
+                              placeholder="手动输入" 
                               className={`flex-1 min-w-[100px] px-3 md:px-4 rounded-lg border outline-none transition-colors focus:ring-2 focus:ring-blue-500 ${inputHeight} text-[13px] md:${textBase} ${inputBg} ${record.isModelLocked ? 'opacity-60' : ''}`} 
                           />
                           <button onClick={() => openSearchModal(record.brand, record.model)} className={`px-3 md:px-4 rounded-lg font-black shrink-0 transition-transform hover:scale-[1.02] active:scale-95 shadow-md ${inputHeight} bg-red-500 text-white text-[13px] md:${textBase}`}>全网查低价</button>
-                          <button onClick={() => updateRecord(record.id, 'isModelLocked', !record.isModelLocked)} className="p-2 md:p-3 border rounded-lg shrink-0 transition-colors hover:bg-gray-500/10">
+                          <button onClick={() => updateRecord(record.id, 'isModelLocked', !record.isModelLocked)} className="p-2 md:p-3 border rounded-lg shrink-0 transition-colors hover:bg-gray-500/10 ml-auto">
                               {record.isModelLocked ? <Lock className="text-green-500" size={20} /> : <Unlock size={20} />}
                           </button>
-                          <span className={`font-bold shrink-0 w-20 md:w-24 text-center transition-colors text-[13px] md:${textSmall} ${record.isModelLocked ? 'text-green-500' : 'text-orange-500'}`}>
+                          <span className={`font-bold shrink-0 w-20 md:w-24 text-left whitespace-nowrap transition-colors text-[13px] md:${textSmall} ${record.isModelLocked ? 'text-green-500' : 'text-orange-500'}`}>
                               {record.isModelLocked ? '👈已确定' : '👈确定了吗？'}
                           </span>
                       </div>
