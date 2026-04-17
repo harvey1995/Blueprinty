@@ -285,39 +285,65 @@ const App = () => {
 
       {/* 顶部功能区 */}
       <header className="px-4 py-4 shadow-sm sticky top-0 z-40 backdrop-blur-md bg-opacity-90 transition-colors duration-300">
-        <div className={`${containerWidthClass} mx-auto flex ${viewMode === 'mobile' ? 'flex-col items-start' : 'justify-between items-center'} gap-4 transition-all duration-300`}>
-          <h1 className={`font-black tracking-wider ${textTitle}`}>🏡 Pintol装修小助手</h1>
-          
-          <div className={`flex ${viewMode === 'mobile' ? 'flex-wrap justify-start' : 'justify-end items-center'} gap-2 w-full`}>
-            <div className="flex items-center gap-2">
+        <div className={`${containerWidthClass} mx-auto flex flex-col gap-4 transition-all duration-300`}>
+          <div className="flex justify-between items-center w-full">
+            <h1 className={`font-black tracking-wider whitespace-nowrap ${textTitle}`}>🏡 Pintol装修小助手</h1>
+            
+            <div className="flex justify-end items-center gap-2">
+              {viewMode === 'web' && (
+                <>
+                  <div className="flex items-center gap-2">
+                    {/* 6. 上方按钮需要导入、导出，并且按钮上面有具体文字 */}
+                    <label className="px-4 py-2 bg-blue-500 text-white rounded-lg cursor-pointer flex items-center gap-1 text-sm font-bold shadow-sm transition-all hover:opacity-90 shrink-0">
+                      <Upload size={18}/> 导入
+                      <input type="file" accept=".csv" onChange={handleImport} className="hidden" />
+                    </label>
+                    <button onClick={handleExport} className="px-4 py-2 bg-green-500 text-white rounded-lg flex items-center gap-1 text-sm font-bold shadow-sm transition-all hover:opacity-90 shrink-0">
+                      <Download size={18}/> 导出
+                    </button>
+                  </div>
+                  <div className="w-px h-6 bg-gray-400 mx-1 shrink-0" />
+                  <div className="flex items-center gap-2">
+                    <button onClick={handleUndo} disabled={past.length === 0} className="px-3 py-2 border rounded-lg flex items-center gap-1 text-sm font-bold transition-all shrink-0 disabled:opacity-30 disabled:cursor-not-allowed opacity-80 hover:opacity-100">
+                      <Undo2 size={18}/> 撤销
+                    </button>
+                    <button onClick={handleRedo} disabled={future.length === 0} className="px-3 py-2 border rounded-lg flex items-center gap-1 text-sm font-bold transition-all shrink-0 disabled:opacity-30 disabled:cursor-not-allowed opacity-80 hover:opacity-100">
+                      <Redo2 size={18}/> 重做
+                    </button>
+                  </div>
+                  <div className="w-px h-6 bg-gray-400 mx-1 shrink-0" />
+                </>
+              )}
+              
+              <div className="flex items-center gap-2">
+                <button onClick={() => setIsDarkMode(!isDarkMode)} className="w-10 h-10 flex items-center justify-center rounded-lg border hover:bg-gray-500/10 transition-all shrink-0">
+                  {isDarkMode ? <SunMedium size={20} className="text-yellow-400" /> : <Moon size={20} className="text-indigo-500" />}
+                </button>
+                <button onClick={() => setViewMode(viewMode === 'mobile' ? 'web' : 'mobile')} className="w-10 h-10 flex items-center justify-center rounded-lg border text-orange-500 hover:bg-gray-500/10 transition-all shrink-0">
+                  {viewMode === 'mobile' ? <Monitor size={20} /> : <Smartphone size={20} />}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {viewMode === 'mobile' && (
+            <div className="flex justify-between items-center gap-2 w-full">
               {/* 6. 上方按钮需要导入、导出，并且按钮上面有具体文字 */}
-              <label className="px-4 py-2 bg-blue-500 text-white rounded-lg cursor-pointer flex items-center gap-1 text-sm font-bold shadow-sm transition-all hover:opacity-90 shrink-0">
+              <label className="flex-1 flex justify-center py-2 bg-blue-500 text-white rounded-lg cursor-pointer items-center gap-1 text-sm font-bold shadow-sm transition-all hover:opacity-90 shrink-0">
                 <Upload size={18}/> 导入
                 <input type="file" accept=".csv" onChange={handleImport} className="hidden" />
               </label>
-              <button onClick={handleExport} className="px-4 py-2 bg-green-500 text-white rounded-lg flex items-center gap-1 text-sm font-bold shadow-sm transition-all hover:opacity-90 shrink-0">
+              <button onClick={handleExport} className="flex-1 flex justify-center py-2 bg-green-500 text-white rounded-lg items-center gap-1 text-sm font-bold shadow-sm transition-all hover:opacity-90 shrink-0">
                 <Download size={18}/> 导出
               </button>
-            </div>
-            {viewMode === 'web' && <div className="w-px h-6 bg-gray-400 mx-1 shrink-0" />}
-            <div className="flex items-center gap-2">
-              <button onClick={handleUndo} disabled={past.length === 0} className="px-3 py-2 border rounded-lg flex items-center gap-1 text-sm font-bold transition-all shrink-0 disabled:opacity-30 disabled:cursor-not-allowed opacity-80 hover:opacity-100">
+              <button onClick={handleUndo} disabled={past.length === 0} className="flex-1 flex justify-center py-2 border rounded-lg items-center gap-1 text-sm font-bold transition-all shrink-0 disabled:opacity-30 disabled:cursor-not-allowed opacity-80 hover:opacity-100">
                 <Undo2 size={18}/> 撤销
               </button>
-              <button onClick={handleRedo} disabled={future.length === 0} className="px-3 py-2 border rounded-lg flex items-center gap-1 text-sm font-bold transition-all shrink-0 disabled:opacity-30 disabled:cursor-not-allowed opacity-80 hover:opacity-100">
+              <button onClick={handleRedo} disabled={future.length === 0} className="flex-1 flex justify-center py-2 border rounded-lg items-center gap-1 text-sm font-bold transition-all shrink-0 disabled:opacity-30 disabled:cursor-not-allowed opacity-80 hover:opacity-100">
                 <Redo2 size={18}/> 重做
               </button>
             </div>
-            {viewMode === 'web' && <div className="w-px h-6 bg-gray-400 mx-1 shrink-0" />}
-            <div className="flex items-center gap-2">
-              <button onClick={() => setIsDarkMode(!isDarkMode)} className="w-10 h-10 flex items-center justify-center rounded-lg border hover:bg-gray-500/10 transition-all shrink-0">
-                {isDarkMode ? <SunMedium size={20} className="text-yellow-400" /> : <Moon size={20} className="text-indigo-500" />}
-              </button>
-              <button onClick={() => setViewMode(viewMode === 'mobile' ? 'web' : 'mobile')} className="w-10 h-10 flex items-center justify-center rounded-lg border text-orange-500 hover:bg-gray-500/10 transition-all shrink-0">
-                {viewMode === 'mobile' ? <Monitor size={20} /> : <Smartphone size={20} />}
-              </button>
-            </div>
-          </div>
+          )}
         </div>
       </header>
 
