@@ -3,7 +3,8 @@ import {
   Upload, Download, Plus, CheckCircle, Trash2, Pencil, X,
   ChevronRight, RefreshCw, ChevronDown, Lock, Unlock,
   Undo2, Redo2, Moon, SunMedium, Type, AlertTriangle, 
-  Search, Info, Settings, PlusCircle, ExternalLink
+  Search, Info, Settings, PlusCircle, ExternalLink,
+  Monitor, Smartphone
 } from 'lucide-react';
 
 // --- 预设数据与联动逻辑 ---
@@ -79,6 +80,7 @@ const App = () => {
       const saved = localStorage.getItem('renovation_theme_v1');
       return saved ? JSON.parse(saved) : true; 
   });
+  const [viewMode, setViewMode] = useState('web');
 
   // --- 状态与提醒逻辑 ---
   useEffect(() => {
@@ -259,6 +261,7 @@ const App = () => {
   const cardBg = isDarkMode ? 'bg-[#24272d] border-gray-700' : 'bg-[#fffaf0] border-[#e8ddc5]';
   const inputBg = isDarkMode ? 'bg-[#1e2025] border-gray-600 text-white' : 'bg-white border-[#d4c8b0] text-black';
   const btnBgPrimary = isDarkMode ? 'bg-[#4361ee] text-white' : 'bg-[#3a5a40] text-white';
+  const containerWidthClass = viewMode === 'mobile' ? 'max-w-[430px]' : 'max-w-4xl';
   
   const textBase = isLargeFont ? 'text-lg' : 'text-sm';
   const textTitle = isLargeFont ? 'text-2xl' : 'text-lg';
@@ -282,7 +285,7 @@ const App = () => {
 
       {/* 顶部功能区 */}
       <header className="px-4 py-4 shadow-sm sticky top-0 z-40 backdrop-blur-md bg-opacity-90 transition-colors duration-300">
-        <div className="max-w-4xl mx-auto flex justify-between items-center gap-4">
+        <div className={`${containerWidthClass} mx-auto flex justify-between items-center gap-4 transition-all duration-300`}>
           <h1 className={`font-black tracking-wider ${textTitle}`}>🏡 Pintol装修小助手</h1>
           
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
@@ -295,21 +298,24 @@ const App = () => {
               <Download size={18}/> 导出
             </button>
             <div className="w-px h-6 bg-gray-400 mx-1 shrink-0" />
-            <button onClick={handleUndo} className="px-3 py-2 border rounded-lg flex items-center gap-1 text-sm font-bold opacity-80 hover:opacity-100 transition-all shrink-0">
+            <button onClick={handleUndo} disabled={past.length === 0} className="px-3 py-2 border rounded-lg flex items-center gap-1 text-sm font-bold transition-all shrink-0 disabled:opacity-30 disabled:cursor-not-allowed opacity-80 hover:opacity-100">
               <Undo2 size={18}/> 撤销
             </button>
-            <button onClick={handleRedo} className="px-3 py-2 border rounded-lg flex items-center gap-1 text-sm font-bold opacity-80 hover:opacity-100 transition-all shrink-0">
+            <button onClick={handleRedo} disabled={future.length === 0} className="px-3 py-2 border rounded-lg flex items-center gap-1 text-sm font-bold transition-all shrink-0 disabled:opacity-30 disabled:cursor-not-allowed opacity-80 hover:opacity-100">
               <Redo2 size={18}/> 重做
             </button>
             <div className="w-px h-6 bg-gray-400 mx-1 shrink-0" />
             <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 rounded-lg border hover:bg-gray-500/10 transition-all shrink-0">
               {isDarkMode ? <SunMedium className="text-yellow-400" /> : <Moon className="text-indigo-500" />}
             </button>
+            <button onClick={() => setViewMode(viewMode === 'mobile' ? 'web' : 'mobile')} className="p-2 rounded-lg border text-orange-500 hover:bg-gray-500/10 transition-all shrink-0">
+              {viewMode === 'mobile' ? <Monitor size={20} /> : <Smartphone size={20} />}
+            </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto mt-6 px-4">
+      <main className={`${containerWidthClass} mx-auto mt-6 px-4 transition-all duration-300`}>
         
         {/* Tab 栏 */}
         <div className="flex items-center gap-3 overflow-x-auto pb-4 no-scrollbar">
@@ -338,11 +344,12 @@ const App = () => {
                     请打开具体产品页、新增记录
                 </div>
             ) : (
-                <div className={`rounded-2xl border overflow-hidden transition-colors duration-300 ${cardBg}`}>
-                    <table className="w-full text-left border-collapse">
+                <div className={`rounded-2xl border overflow-x-auto transition-colors duration-300 ${cardBg}`}>
+                    <table className="w-full text-left border-collapse min-w-max">
                         <thead>
                             <tr className="border-b border-gray-500/20 opacity-70">
-                                <th className={`p-3 ${textSmall}`}>类别</th>
+                                <th className={`p-3 ${textSmall}`}>大类</th>
+                                <th className={`p-3 ${textSmall}`}>小类</th>
                                 <th className={`p-3 ${textSmall}`}>品牌型号</th>
                                 <th className={`p-3 ${textSmall}`}>最低价</th>
                                 <th className={`p-3 ${textSmall}`}>操作</th>
@@ -351,13 +358,21 @@ const App = () => {
                         <tbody>
                             {appState.records.map(r => (
                                 <tr key={r.id} className="border-b border-gray-500/10 hover:bg-gray-500/5 transition-colors">
-                                    <td className={`p-3 font-bold ${textSmall}`}>{r.category}·{r.subCategory || '-'}</td>
+                                    <td className={`p-3 font-bold ${textSmall}`}>
+                                        {r.category ? r.category : <span className="text-red-500">-</span>}
+                                    </td>
+                                    <td className={`p-3 font-bold ${textSmall}`}>
+                                        {r.subCategory ? r.subCategory : <span className="text-red-500">-</span>}
+                                    </td>
                                     <td className={`p-3 ${textSmall}`}>{r.brand} {r.model}</td>
                                     <td className={`p-3 text-red-500 font-black ${textSmall}`}>
                                         ￥{Math.min(...r.prices.map(p => parseFloat(p.price) || Infinity)).toString().replace('Infinity', '-')}
                                     </td>
                                     <td className="p-3">
-                                        <button onClick={() => { setActiveTab(r.category); setTimeout(() => document.getElementById(r.id)?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="text-indigo-500 transition-transform hover:scale-110"><ExternalLink size={18}/></button>
+                                        <button onClick={() => { setActiveTab(r.category); setTimeout(() => document.getElementById(r.id)?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="text-indigo-500 transition-transform hover:scale-105 flex items-center gap-1">
+                                            <ExternalLink size={18}/>
+                                            <span className="text-sm font-bold whitespace-nowrap">点击前往{r.category || '-'}</span>
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
