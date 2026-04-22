@@ -468,6 +468,12 @@ const App = () => {
                                       updateRecord(record.id, 'subCategory', '');
                                   }
                               }}
+                              onClick={(e) => {
+                                  if (record.subCategory) {
+                                      e.target.dataset.old = record.subCategory;
+                                      updateRecord(record.id, 'subCategory', '');
+                                  }
+                              }}
                               onBlur={(e) => {
                                   if (!record.subCategory && e.target.dataset.old) {
                                       updateRecord(record.id, 'subCategory', e.target.dataset.old);
@@ -502,6 +508,12 @@ const App = () => {
                               placeholder="点击选择或手动输入" 
                               value={record.brand} 
                               onFocus={(e) => {
+                                  if (record.brand) {
+                                      e.target.dataset.old = record.brand;
+                                      updateRecord(record.id, 'brand', '');
+                                  }
+                              }}
+                              onClick={(e) => {
                                   if (record.brand) {
                                       e.target.dataset.old = record.brand;
                                       updateRecord(record.id, 'brand', '');
@@ -574,7 +586,33 @@ const App = () => {
                       </div>
                       {record.prices.map((p, pIdx) => (
                           <div key={p.id} className="flex gap-2 items-center flex-wrap sm:flex-nowrap animate-in slide-in-from-top-2 duration-300">
-                              <input list="channel-list" value={p.channel} onChange={(e) => updatePrice(record.id, p.id, 'channel', e.target.value)} placeholder="选择渠道" className={`w-24 md:w-1/3 px-3 md:px-4 rounded-lg border outline-none transition-colors ${inputHeight} text-[13px] md:${textBase} ${inputBg}`} />
+                              <input 
+                                  list="channel-list" 
+                                  value={p.channel} 
+                                  onFocus={(e) => {
+                                      if (p.channel) {
+                                          e.target.dataset.old = p.channel;
+                                          updatePrice(record.id, p.id, 'channel', '');
+                                      }
+                                  }}
+                                  onClick={(e) => {
+                                      if (p.channel) {
+                                          e.target.dataset.old = p.channel;
+                                          updatePrice(record.id, p.id, 'channel', '');
+                                      }
+                                  }}
+                                  onBlur={(e) => {
+                                      if (!p.channel && e.target.dataset.old) {
+                                          updatePrice(record.id, p.id, 'channel', e.target.dataset.old);
+                                      }
+                                  }}
+                                  onChange={(e) => {
+                                      e.target.dataset.old = '';
+                                      updatePrice(record.id, p.id, 'channel', e.target.value);
+                                  }} 
+                                  placeholder="选择渠道" 
+                                  className={`w-24 md:w-1/3 px-3 md:px-4 rounded-lg border outline-none transition-colors ${inputHeight} text-[13px] md:${textBase} ${inputBg}`} 
+                              />
                               <input type="number" value={p.price} onChange={(e) => updatePrice(record.id, p.id, 'price', e.target.value)} placeholder="价格" className={`flex-1 min-w-[100px] px-3 md:px-4 rounded-lg border outline-none font-bold transition-colors focus:ring-2 focus:ring-blue-500 ${inputHeight} text-[13px] md:${textBase} ${inputBg}`} />
                               {record.prices.length > 1 && <button onClick={() => removePrice(record.id, p.id)} className="p-2 md:p-3 text-red-500 transition-transform hover:scale-110 shrink-0"><X size={20}/></button>}
                           </div>
