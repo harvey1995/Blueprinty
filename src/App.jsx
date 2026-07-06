@@ -42,7 +42,7 @@ const AI_RECOMMENDATIONS = {
 const PRESET_CATEGORIES = Object.keys(CATEGORY_MAP);
 
 // 5. 购买渠道顺序调整
-const PRESET_CHANNELS = ['淘宝', '天猫', '京东', '苏宁', '拼多多', '线下门店'];
+const PRESET_CHANNELS = ['淘宝', '天猫', '京东', '苏宁', '拼多多', '实体店'];
 
 const generateId = () => `id-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 const getTodayDate = () => new Date().toISOString().split('T')[0];
